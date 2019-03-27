@@ -166,11 +166,11 @@
         </div>
       </div>
     </div>
-    <div class="section" v-for="(item,index) in goodslist" :key='index'>
+    <div class="section" v-for="item in goodslist" >
       <div class="main-tit">
         <h2>{{item.catetitle}}</h2>
         <p>
-          <a href="/goods/43.html" v-for="(it,index) in item.level2catelist" :key='index'>{{it.subcatetitle}}</a>
+          <a href="/goods/43.html" v-for="it in item.level2catelist" >{{it.subcatetitle}}</a>
          
          
           <a href="/goods/40.html">
@@ -182,8 +182,9 @@
       <div class="wrapper clearfix">
         <div class="wrap-box">
           <ul class="img-list">
-            <li v-for="(it,index) in item.datas" :key='index'>
-              <a href="#/site/goodsinfo/87" class>
+            <li v-for="it in item.datas" >
+                <router-link :to="'/detail/'+it.artID">
+              <!-- <a href="#/site/goodsinfo/87" class> -->
                 <div class="img-box">
                   <img
                     :src="it.img_url"
@@ -202,7 +203,8 @@
                     </span>
                   </p>
                 </div>
-              </a>
+                </router-link>
+              <!-- </a> -->
             </li>
             
           </ul>

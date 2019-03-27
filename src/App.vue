@@ -90,7 +90,7 @@
     </div>
 
     <!-- 页面区域 -->
-
+ <router-view></router-view>
     <!-- 尾部区域 -->
 
     <div class="footer">

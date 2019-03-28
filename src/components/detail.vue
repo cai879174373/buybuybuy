@@ -179,15 +179,21 @@
                 <ul class="side-img-list">
                   <li v-for="item in hotgoodslist">
                     <div class="img-box">
-                      <a href="#/site/goodsinfo/90" class>
+                      <!-- <a href="#/site/goodsinfo/90" class> -->
+                      <router-link :to="'/detail/'+item.id">
                         <img
                           :src="item.img_url"
                         >
-                      </a>
+                      <!-- </a> -->
+                      </router-link>
                     </div>
                     <div class="txt-box">
-                      <a href="#/site/goodsinfo/90" class>{{item.title}}</a>
-                      <span>{{item.add_time|formtTime}} </span>
+                      <!-- <a href="#/site/goodsinfo/90" class> -->
+                        <router-link :to="'/detail/'+item.id">
+                      {{item.title}}
+                      <!-- </a> -->
+                       </router-link>
+                      <span>{{item.add_time|globalFormatTime('YYYY年MM月DD日')}} </span>
                     </div>
                   </li>
                  
@@ -228,11 +234,11 @@ export default {
         this.hotgoodslist=res.data.message.hotgoodslist
       });
   },
-  filters:{
-      formtTime(value){
-          return moment(value).format('YYYY-MM-DD');
-      }
-  }
+  // filters:{
+  //     formtTime(value){
+  //         return moment(value).format('YYYY-MM-DD');
+  //     }
+  // }
 };
 </script>
 

@@ -157,7 +157,7 @@
                 </div>
                 <div class="txt-box">
                   <a href="/goods/show-98.html">{{item.title}}</a>
-                  <span>{{item.add_time|formatime}}</span>
+                  <span>{{item.add_time|globalFormatTime}}</span>
                 </div>
               </li>
               
@@ -217,7 +217,7 @@
 
 <script>
 // import axios from 'axios'
-import moment from 'moment'
+// import moment from 'moment'
 export default {
     name:'index',
     data(){
@@ -242,11 +242,11 @@ export default {
         this.goodslist=res.data.message
     })
     },
-    filters:{
-        formatime(value){
-            return moment(value).format('YYYY-MM-DD');
-        }
-    }
+    // filters:{
+    //     formatime(value){
+    //         return moment(value).format('YYYY-MM-DD');
+    //     }
+    // }
 };
 </script>
 

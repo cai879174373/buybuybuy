@@ -13,6 +13,15 @@ axios.defaults.baseURL='http://111.230.232.110:8899'
 
 import './assets/statics/site/css/style.css'
 
+import moment from 'moment'
+Vue.filter('globalFormatTime',function(value,tempform){
+  if(tempform){
+    return moment(value).format(tempform)
+  }else{
+    return moment(value).format('YYYY-MM-DD')
+  }
+})
+
 
 import index from './components/index.vue'
 import cart from './components/cart.vue'

@@ -13,7 +13,14 @@
         <div class="wrap-box">
           <div class="left-925">
             <div class="goods-box clearfix">
-              <div class="pic-box"></div>
+              <div class="pic-box">
+                <el-carousel >
+                  <el-carousel-item v-for="(item,index) in imglist" :key="index">
+                    <!-- <h3>{{ item }}</h3> -->
+                    <img :src="item.thumb_path" alt="">
+                  </el-carousel-item>
+                </el-carousel>
+              </div>
               <div class="goods-spec">
                 <h1>{{goodsinfo.title}}</h1>
                 <p class="subtitle">{{goodsinfo.sub_title}}</p>
@@ -95,6 +102,7 @@
                           sucmsg=" "
                           data-type="*10-1000"
                           nullmsg="请填写评论内容！"
+                          v-model.trim="comment"
                         ></textarea>
                         <span class="Validform_checktip"></span>
                       </div>
@@ -105,6 +113,7 @@
                           type="submit"
                           value="提交评论"
                           class="submit"
+                          @click="postComment"
                         >
                         <span class="Validform_checktip"></span>
                       </div>
@@ -192,7 +201,9 @@ export default {
       goodsinfo: {},
       index: 1,
       hotgoodslist: [],
-      num1:1
+      num1: 1,
+      imglist:[],
+      comment:''
     };
   },
   methods: {
@@ -205,11 +216,27 @@ export default {
 
           // 推荐商品
           this.hotgoodslist = res.data.message.hotgoodslist;
+          this.imglist=res.data.message.imglist
         });
     },
-    handleChange(){
-      console.log('我变了');
+    handleChange() {
+      console.log("我变了");
+    },
+  postComment(){
+    if(this.comment===''){
+       this.$message.error('请输入一点东西吧！');
+    }else{
+      this.$axios.post(`site/validate/comment/post/goods/1${this.$route.params.id}`,{
+         commenttxt:this.comment
+      }).then(res=>{
+        console.log(res);
+        if(res.data.status==0){
+           this.$message.success('评论成功啦');
+           this.comment=''
+        }
+      })
     }
+  }
   },
   created() {
     this.getDetail();
@@ -222,7 +249,7 @@ export default {
 
   watch: {
     $route: function(value, oldvalue) {
-      console.log(value, oldvalue);
+      // console.log(value, oldvalue);
       this.getDetail();
     }
   }
@@ -230,4 +257,20 @@ export default {
 </script>
 
 <style>
+.pic-box{
+  width: 395px;
+  height: 320px;
+}
+.pic-box .el-carousel{
+   width: 100%;
+  height: 100%;
+}
+.pic-box .el-carousel__container{
+  width: 100%;
+  height: 100%;
+}
+.pic-box .el-carousel__container img {
+  width: 100%;
+  height: 100%;
+}
 </style>

@@ -195,7 +195,7 @@ export default {
   },
   created() {
     this.$axios.get(`/site/goods/gettopdata/goods`).then(res => {
-      console.log(res);
+      // console.log(res);
       this.catelist = res.data.message.catelist;
       this.sliderlist = res.data.message.sliderlist;
       this.toplist = res.data.message.toplist;

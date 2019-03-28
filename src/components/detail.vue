@@ -14,10 +14,10 @@
           <div class="left-925">
             <div class="goods-box clearfix">
               <div class="pic-box">
-                <el-carousel >
+                <el-carousel>
                   <el-carousel-item v-for="(item,index) in imglist" :key="index">
                     <!-- <h3>{{ item }}</h3> -->
-                    <img :src="item.thumb_path" alt="">
+                    <img :src="item.thumb_path" alt>
                   </el-carousel-item>
                 </el-carousel>
               </div>
@@ -123,37 +123,29 @@
                     <p
                       style="margin: 5px 0px 15px 69px; line-height: 42px; text-align: center; border: 1px solid rgb(247, 247, 247);"
                     >暂无评论，快来抢沙发吧！</p>
-                    <li>
+                    <li v-for="item in commentlist">
                       <div class="avatar-box">
                         <i class="iconfont icon-user-full"></i>
                       </div>
                       <div class="inner-box">
                         <div class="info">
-                          <span>匿名用户</span>
-                          <span>2017/10/23 14:58:59</span>
+                          <span>{{item.user_name}}</span>
+                          <span>{{item.add_time|globalFormatTime('YYYY-MM-DDThh:mm:ss')}}</span>
                         </div>
-                        <p>testtesttest</p>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="avatar-box">
-                        <i class="iconfont icon-user-full"></i>
-                      </div>
-                      <div class="inner-box">
-                        <div class="info">
-                          <span>匿名用户</span>
-                          <span>2017/10/23 14:59:36</span>
-                        </div>
-                        <p>很清晰调动单很清晰调动单</p>
+                        <p>{{item.content}}</p>
                       </div>
                     </li>
                   </ul>
                   <div class="page-box" style="margin: 5px 0px 0px 62px;">
-                    <div id="pagination" class="digg">
-                      <span class="disabled">« 上一页</span>
-                      <span class="current">1</span>
-                      <span class="disabled">下一页 »</span>
-                    </div>
+                    <el-pagination
+                      @size-change="handleSizeChange"
+                      @current-change="handleCurrentChange"
+                      :current-page="pageIndex"
+                      :page-sizes="[8, 10, 15, 20]"
+                      :page-size="pageSize"
+                      layout="total, sizes, prev, pager, next, jumper"
+                      :total="totalcount"
+                    ></el-pagination>
                   </div>
                 </div>
               </div>
@@ -202,8 +194,15 @@ export default {
       index: 1,
       hotgoodslist: [],
       num1: 1,
-      imglist:[],
-      comment:''
+      imglist: [],
+      comment: "",
+      // 页码
+      pageIndex: 1,
+      // 页容量
+      pageSize: 10,
+      // 总评论
+      totalcount: 0,
+      commentlist: []
     };
   },
   methods: {
@@ -216,30 +215,57 @@ export default {
 
           // 推荐商品
           this.hotgoodslist = res.data.message.hotgoodslist;
-          this.imglist=res.data.message.imglist
+          this.imglist = res.data.message.imglist;
         });
     },
     handleChange() {
       console.log("我变了");
     },
-  postComment(){
-    if(this.comment===''){
-       this.$message.error('请输入一点东西吧！');
-    }else{
-      this.$axios.post(`site/validate/comment/post/goods/1${this.$route.params.id}`,{
-         commenttxt:this.comment
-      }).then(res=>{
-        console.log(res);
-        if(res.data.status==0){
-           this.$message.success('评论成功啦');
-           this.comment=''
-        }
-      })
+    postComment() {
+      if (this.comment === "") {
+        this.$message.error("请输入一点东西吧！");
+      } else {
+        this.$axios
+          .post(`site/validate/comment/post/goods/${this.$route.params.id}`, {
+            commenttxt: this.comment
+          })
+          .then(res => {
+            console.log(res);
+            if (res.data.status == 0) {
+              //  this.$message.success('评论成功啦');
+              this.$message.success("评论ok");
+              this.comment = "";
+              this.pageIndex=1;
+              this.getcomments();
+            }
+          });
+      }
+    },
+    getcomments() {
+      this.$axios
+        .get(
+          `site/comment/getbypage/goods/${this.$route.params.id}?pageIndex=${
+            this.pageIndex
+          }&pageSize=${this.pageSize}`
+        )
+        .then(res => {
+          console.log(res);
+          this.totalcount = res.data.totalcount;
+          this.commentlist = res.data.message;
+        });
+    },
+    handleSizeChange(size) {
+      this.pageSize = size;
+      this.getcomments();
+    },
+    handleCurrentChange(Current) {
+      this.pageIndex = Current;
+      this.getcomments();
     }
-  }
   },
   created() {
     this.getDetail();
+    this.getcomments();
   },
   // filters:{
   //     formtTime(value){
@@ -257,15 +283,15 @@ export default {
 </script>
 
 <style>
-.pic-box{
+.pic-box {
   width: 395px;
   height: 320px;
 }
-.pic-box .el-carousel{
-   width: 100%;
+.pic-box .el-carousel {
+  width: 100%;
   height: 100%;
 }
-.pic-box .el-carousel__container{
+.pic-box .el-carousel__container {
   width: 100%;
   height: 100%;
 }

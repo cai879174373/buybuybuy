@@ -249,7 +249,7 @@ export default {
           }&pageSize=${this.pageSize}`
         )
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.totalcount = res.data.totalcount;
           this.commentlist = res.data.message;
         });

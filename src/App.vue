@@ -18,7 +18,11 @@
               <strong>|</strong>
             </span>
             <span>
-              <a href class>会员中心</a>
+              <!-- <a href class> -->
+                <router-link to="/user">
+                会员中心
+                </router-link>
+                <!-- </a> -->
               <strong>|</strong>
               <a>退出</a>
               <strong>|</strong>

@@ -10,6 +10,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
 
+import router from './router.js'
 
 import axios from 'axios'
 Vue.prototype.$axios=axios
@@ -28,32 +29,8 @@ Vue.filter('globalFormatTime',function(value,tempform){
 })
 
 
-import index from './components/index.vue'
-import cart from './components/cart.vue'
-import detail from './components/detail.vue'
-import userContainer from './components/userContainer.vue'
-import userIndex from './components/userIndex.vue'
-import userOrder from './components/userOrder.vue'
-import userDetail from './components/userDetail.vue'
-// 规则
-let routes=[
-  {path:'/index',component:index},
-  {path:'/',component:index},
-  {path:'/cart',component:cart},
-  {path:'/detail/:id',component:detail},
-  {path:'/user',component:userContainer,
-  children:[
-    {path:'Index',component:userIndex},
-    {path:'Order',component:userOrder},
-    {path:'Detail',component:userDetail},
-    
-  ]
 
-},
-]
-let router =new VueRouter({
-  routes
-})
+
 new Vue({
   el:'#app',
   render: h => h(App),

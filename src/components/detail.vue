@@ -40,35 +40,13 @@
                     <dt>购买数量</dt>
                     <dd>
                       <div class="stock-box">
-                        <div class="el-input-number el-input-number--small">
-                          <span role="button" class="el-input-number__decrease is-disabled">
-                            <i class="el-icon-minus"></i>
-                          </span>
-                          <span role="button" class="el-input-number__increase">
-                            <i class="el-icon-plus"></i>
-                          </span>
-                          <div class="el-input el-input--small">
-                            <!---->
-                            <input
-                              autocomplete="off"
-                              size="small"
-                              type="text"
-                              rows="2"
-                              max="60"
-                              min="1"
-                              validateevent="true"
-                              class="el-input__inner"
-                              role="spinbutton"
-                              aria-valuemax="60"
-                              aria-valuemin="1"
-                              aria-valuenow="1"
-                              aria-disabled="false"
-                            >
-                            <!---->
-                            <!---->
-                            <!---->
-                          </div>
-                        </div>
+                        <el-input-number
+                          v-model="num1"
+                          @change="handleChange"
+                          :min="1"
+                          :max="10"
+                          label="描述文字"
+                        ></el-input-number>
                       </div>
                       <span class="stock-txt">
                         库存
@@ -95,15 +73,15 @@
               >
                 <ul>
                   <li>
-                    <a href="javascript:;" @click='index=1' :class="{selected:index==1}">商品介绍</a>
+                    <a href="javascript:;" @click="index=1" :class="{selected:index==1}">商品介绍</a>
                   </li>
                   <li>
-                    <a href="javascript:;"  @click='index=2' :class="{selected:index==2}" >商品评论</a>
+                    <a href="javascript:;" @click="index=2" :class="{selected:index==2}">商品评论</a>
                   </li>
                 </ul>
               </div>
-              <div class="tab-content entry" v-show="index==1"  v-html='goodsinfo.content'></div>
-              <div class="tab-content"  v-show="index==2">
+              <div class="tab-content entry" v-show="index==1" v-html="goodsinfo.content"></div>
+              <div class="tab-content" v-show="index==2">
                 <div class="comment-box">
                   <div id="commentForm" name="commentForm" class="form-box">
                     <div class="avatar-box">
@@ -181,22 +159,19 @@
                     <div class="img-box">
                       <!-- <a href="#/site/goodsinfo/90" class> -->
                       <router-link :to="'/detail/'+item.id">
-                        <img
-                          :src="item.img_url"
-                        >
-                      <!-- </a> -->
+                        <img :src="item.img_url">
+                        <!-- </a> -->
                       </router-link>
                     </div>
                     <div class="txt-box">
                       <!-- <a href="#/site/goodsinfo/90" class> -->
-                        <router-link :to="'/detail/'+item.id">
-                      {{item.title}}
-                      <!-- </a> -->
-                       </router-link>
-                      <span>{{item.add_time|globalFormatTime('YYYY年MM月DD日')}} </span>
+                      <router-link :to="'/detail/'+item.id">
+                        {{item.title}}
+                        <!-- </a> -->
+                      </router-link>
+                      <span>{{item.add_time|globalFormatTime('YYYY年MM月DD日')}}</span>
                     </div>
                   </li>
-                 
                 </ul>
               </div>
             </div>
@@ -209,36 +184,48 @@
 
 <script>
 // import axios from "axios";
-import moment from "moment"
+// import moment from "moment";
 export default {
   name: "detail",
   data() {
     return {
       goodsinfo: {},
-      index:1,
-      hotgoodslist:[]
+      index: 1,
+      hotgoodslist: [],
+      num1:1
     };
   },
-  created() {
-    this.$axios
-      .get(
-        `/site/goods/getgoodsinfo/${
-          this.$route.params.id
-        }`
-      )
-      .then(res => {
-        // console.log(res);
-        this.goodsinfo = res.data.message.goodsinfo;
+  methods: {
+    getDetail() {
+      this.$axios
+        .get(`/site/goods/getgoodsinfo/${this.$route.params.id}`)
+        .then(res => {
+          // console.log(res);
+          this.goodsinfo = res.data.message.goodsinfo;
 
-        // 推荐商品
-        this.hotgoodslist=res.data.message.hotgoodslist
-      });
+          // 推荐商品
+          this.hotgoodslist = res.data.message.hotgoodslist;
+        });
+    },
+    handleChange(){
+      console.log('我变了');
+    }
+  },
+  created() {
+    this.getDetail();
   },
   // filters:{
   //     formtTime(value){
   //         return moment(value).format('YYYY-MM-DD');
   //     }
   // }
+
+  watch: {
+    $route: function(value, oldvalue) {
+      console.log(value, oldvalue);
+      this.getDetail();
+    }
+  }
 };
 </script>
 

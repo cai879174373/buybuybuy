@@ -177,7 +177,7 @@
               <div class="sidebar-box">
                 <h4>推荐商品</h4>
                 <ul class="side-img-list">
-                  <li v-for="item in hotgoodslist">
+                  <li v-for="(item,index) in hotgoodslist" :key="index">
                     <div class="img-box">
                       <a href="#/site/goodsinfo/90" class>
                         <img
@@ -187,7 +187,7 @@
                     </div>
                     <div class="txt-box">
                       <a href="#/site/goodsinfo/90" class>{{item.title}}</a>
-                      <span>{{item.add_time|formtTime}} </span>
+                      <span>{{item.add_time|globalFormatTime}} </span>
                     </div>
                   </li>
                  
@@ -202,8 +202,8 @@
 </template>
 
 <script>
-import axios from "axios";
-import moment from "moment"
+// import axios from "axios";
+// import moment from "moment"
 export default {
   name: "detail",
   data() {
@@ -214,9 +214,9 @@ export default {
     };
   },
   created() {
-    axios
+    this.$axios
       .get(
-        `http://111.230.232.110:8899/site/goods/getgoodsinfo/${
+        `/site/goods/getgoodsinfo/${
           this.$route.params.id
         }`
       )
@@ -228,11 +228,7 @@ export default {
         this.hotgoodslist=res.data.message.hotgoodslist
       });
   },
-  filters:{
-      formtTime(value){
-          return moment(value).format('YYYY-MM-DD');
-      }
-  }
+
 };
 </script>
 

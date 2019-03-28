@@ -5,6 +5,29 @@ import VueRouter from 'vue-router'
 // 使用路由
 Vue.use(VueRouter)
 
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+Vue.use(ElementUI);
+
+// 全局axios；
+import axios from 'axios'
+Vue.prototype.$axios=axios
+
+// 基地址
+axios.defaults.baseURL='http://111.230.232.110:8899'
+
+// 全局过滤器
+import moment from 'moment'
+Vue.filter('globalFormatTime',function(value,tempform){
+  if(tempform){
+    return moment(value).format(tempform)
+  }else{
+    return moment(value).format('YYYY-MM-DD')
+  }
+})
+
+
+
 import './assets/statics/site/css/style.css'
 
 

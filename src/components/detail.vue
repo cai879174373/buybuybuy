@@ -13,7 +13,14 @@
         <div class="wrap-box">
           <div class="left-925">
             <div class="goods-box clearfix">
-              <div class="pic-box"></div>
+              <div class="pic-box">
+                <el-carousel>
+                  <el-carousel-item v-for="(item,index) in imglist" :key="index">
+                    <!-- <h3>{{ item }}</h3> -->
+                    <img :src="item.thumb_path" alt>
+                  </el-carousel-item>
+                </el-carousel>
+              </div>
               <div class="goods-spec">
                 <h1>{{goodsinfo.title}}</h1>
                 <p class="subtitle">{{goodsinfo.sub_title}}</p>
@@ -95,15 +102,15 @@
               >
                 <ul>
                   <li>
-                    <a href="javascript:;" @click='index=1' :class="{selected:index==1}">商品介绍</a>
+                    <a href="javascript:;" @click="index=1" :class="{selected:index==1}">商品介绍</a>
                   </li>
                   <li>
-                    <a href="javascript:;"  @click='index=2' :class="{selected:index==2}" >商品评论</a>
+                    <a href="javascript:;" @click="index=2" :class="{selected:index==2}">商品评论</a>
                   </li>
                 </ul>
               </div>
-              <div class="tab-content entry" v-show="index==1"  v-html='goodsinfo.content'></div>
-              <div class="tab-content"  v-show="index==2">
+              <div class="tab-content entry" v-show="index==1" v-html="goodsinfo.content"></div>
+              <div class="tab-content" v-show="index==2">
                 <div class="comment-box">
                   <div id="commentForm" name="commentForm" class="form-box">
                     <div class="avatar-box">
@@ -117,6 +124,7 @@
                           sucmsg=" "
                           data-type="*10-1000"
                           nullmsg="请填写评论内容！"
+                          v-model.trim="comment"
                         ></textarea>
                         <span class="Validform_checktip"></span>
                       </div>
@@ -127,6 +135,7 @@
                           type="submit"
                           value="提交评论"
                           class="submit"
+                          @click="postcomment"
                         >
                         <span class="Validform_checktip"></span>
                       </div>
@@ -136,37 +145,29 @@
                     <p
                       style="margin: 5px 0px 15px 69px; line-height: 42px; text-align: center; border: 1px solid rgb(247, 247, 247);"
                     >暂无评论，快来抢沙发吧！</p>
-                    <li>
+                    <li v-for="(item,index) in commentlist" :key="index">
                       <div class="avatar-box">
                         <i class="iconfont icon-user-full"></i>
                       </div>
                       <div class="inner-box">
                         <div class="info">
-                          <span>匿名用户</span>
-                          <span>2017/10/23 14:58:59</span>
+                          <span>{{item.user_name}}</span>
+                          <span>{{item.add_time| globalFormatTime('YYYY-MM-DDThh:mm:ss')}}</span>
                         </div>
-                        <p>testtesttest</p>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="avatar-box">
-                        <i class="iconfont icon-user-full"></i>
-                      </div>
-                      <div class="inner-box">
-                        <div class="info">
-                          <span>匿名用户</span>
-                          <span>2017/10/23 14:59:36</span>
-                        </div>
-                        <p>很清晰调动单很清晰调动单</p>
+                        <p>{{item.content}}</p>
                       </div>
                     </li>
                   </ul>
                   <div class="page-box" style="margin: 5px 0px 0px 62px;">
-                    <div id="pagination" class="digg">
-                      <span class="disabled">« 上一页</span>
-                      <span class="current">1</span>
-                      <span class="disabled">下一页 »</span>
-                    </div>
+                    <el-pagination
+                      @size-change="handleSizeChange"
+                      @current-change="handleCurrentChange"
+                      :current-page="pageIndex"
+                      :page-sizes="[10, 20, 30, 40]"
+                      :page-size="pageSize"
+                      layout="total, sizes, prev, pager, next, jumper"
+                      :total="totalcount"
+                    ></el-pagination>
                   </div>
                 </div>
               </div>
@@ -179,18 +180,19 @@
                 <ul class="side-img-list">
                   <li v-for="(item,index) in hotgoodslist" :key="index">
                     <div class="img-box">
-                      <a href="#/site/goodsinfo/90" class>
-                        <img
-                          :src="item.img_url"
-                        >
-                      </a>
+                      <!-- <a href="#/site/goodsinfo/90" class> -->
+                      <router-link :to="'/detail/'+item.id">
+                        <img :src="item.img_url">
+                      </router-link>
+                      <!-- </a> -->
                     </div>
                     <div class="txt-box">
-                      <a href="#/site/goodsinfo/90" class>{{item.title}}</a>
-                      <span>{{item.add_time|globalFormatTime}} </span>
+                      <!-- <a href="#/site/goodsinfo/90" class> -->
+                      <router-link :to="'/detail/'+item.id">{{item.title}}</router-link>
+                      <!-- </a> -->
+                      <span>{{item.add_time|globalFormatTime}}</span>
                     </div>
                   </li>
-                 
                 </ul>
               </div>
             </div>
@@ -209,28 +211,96 @@ export default {
   data() {
     return {
       goodsinfo: {},
-      index:1,
-      hotgoodslist:[]
+      index: 1,
+      hotgoodslist: [],
+      imglist: [],
+      comment: "",
+      // 页码
+      pageIndex: 1,
+      pageSize: 10,
+      totalcount: 0,
+      commentlist: []
     };
   },
-  created() {
-    this.$axios
-      .get(
-        `/site/goods/getgoodsinfo/${
-          this.$route.params.id
-        }`
-      )
-      .then(res => {
-        // console.log(res);
-        this.goodsinfo = res.data.message.goodsinfo;
+  methods: {
+    postcomment() {
+      if (this.comment === "") {
+        this.$message.error("请输入评论内容！");
+      } else {
+        this.$axios
+          .post(`site/validate/comment/post/goods/${this.$route.params.id}`, {
+            commenttxt: this.comment
+          })
+          .then(res => {
+            if (res.data.status == 0) {
+              this.$message.success("评论成功！");
+              this.comment = "";
+            }
+          });
+      }
+    },
+    getdetail() {
+      this.$axios
+        .get(`/site/goods/getgoodsinfo/${this.$route.params.id}`)
+        .then(res => {
+          // console.log(res);
+          this.goodsinfo = res.data.message.goodsinfo;
+          this.imglist = res.data.message.imglist;
 
-        // 推荐商品
-        this.hotgoodslist=res.data.message.hotgoodslist
-      });
+          // 推荐商品
+          this.hotgoodslist = res.data.message.hotgoodslist;
+        });
+    },
+    getcomment() {
+      this.$axios
+        .get(
+          `site/comment/getbypage/goods/${this.$route.params.id}?pageIndex=${
+            this.pageIndex
+          }&pageSize=${this.pageSize}`
+        )
+        .then(res => {
+          // console.log(res);
+          this.totalcount = res.data.totalcount;
+          this.commentlist = res.data.message;
+        });
+    },
+    handleSizeChange(size){
+      this.pageSize=size;
+      this.getcomment();
+    },
+    handleCurrentChange(current){
+      this.pageIndex=current;
+       this.getcomment();
+    }
   },
-
+  created() {
+    this.getdetail();
+    this.getcomment();
+  },
+  watch: {
+    $route() {
+      this.getdetail();
+    }
+  }
 };
 </script>
 
 <style>
+.pic-box {
+  width: 395px;
+  height: 320px;
+}
+.pic-box .el-carousel {
+  width: 100%;
+  height: 100%;
+}
+.pic-box .el-carousel .el-carousel__container {
+  width: 100%;
+  height: 100%;
+}
+.pic-box .el-carousel .el-carousel__container img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 </style>
